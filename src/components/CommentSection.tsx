@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, KeyboardAvoidingView } from 'react-native';
+import { FlatList, KeyboardAvoidingView, StyleSheet } from 'react-native';
 import CommentItem from './CommentItem';
 import CommentInput from './CommentInput';
 import { CommonImages } from '../assets/images';
@@ -12,6 +12,9 @@ type CommentsSectionProps = {
     newComment: string;
     setNewComment: (text: string) => void;
     handleAddComment: () => void;
+    handleMenu: () => void;
+    deleteComment: (id: any) => void;
+    commentDelete?: boolean;
 
 };
 
@@ -22,7 +25,10 @@ const CommentsSection = (props: CommentsSectionProps) => {
         currentTime,  
         newComment, 
         setNewComment, 
-        handleAddComment 
+        handleAddComment,
+        handleMenu,
+        deleteComment,
+        commentDelete
     } = props;
 
     const handleSeek = (time: any) => {
@@ -30,11 +36,11 @@ const CommentsSection = (props: CommentsSectionProps) => {
     };
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior='height' keyboardVerticalOffset={58}>
+        <KeyboardAvoidingView style={styles.container} behavior='height' keyboardVerticalOffset={58}>
             <FlatList
                 data={comments}
                 keyExtractor={item => item.id}
-                renderItem={({ item }) => (<CommentItem item={item} onSeek={handleSeek} />)}
+                renderItem={({ item }) => (<CommentItem item={item} onSeek={handleSeek} handleMenu={handleMenu} deleteComment={deleteComment} commentDelete={commentDelete} />)}
             />
             <CommentInput
                 avatar={CommonImages.avatar}
@@ -47,4 +53,9 @@ const CommentsSection = (props: CommentsSectionProps) => {
         </KeyboardAvoidingView>
     );
 }
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    }
+})
 export default CommentsSection;

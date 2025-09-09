@@ -3,8 +3,9 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { CommonImages } from '../assets/images';
 import { MenuIcon } from '../assets/svg/MenuIcon';
 import moment from 'moment';
+import { CommonMenu } from './CommonMenu';
 
-export default function CommentItem({ item, onSeek }: any) {
+export default function CommentItem({ item, handleMenu , deleteComment, commentDelete }: any) {
   const formatTime = (seconds: any) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -22,7 +23,7 @@ const getDisplayTime = (time:string) => {
   }
 };
   return (
-    <TouchableOpacity onPress={() => onSeek(item.time)} style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Image
           source={CommonImages.avatar}
@@ -32,9 +33,10 @@ const getDisplayTime = (time:string) => {
         />
         <Text style={styles.name}>{"User"}</Text>
         <Text style={styles.time}>{getDisplayTime(JSON.parse(item.id))}</Text>
-        <TouchableOpacity  style={styles.menu}>
+        <TouchableOpacity  style={styles.menu} onPress={handleMenu}>
           <MenuIcon size={18} />
         </TouchableOpacity>
+        <CommonMenu id={item.id} commentDelete={commentDelete} deleteComment={deleteComment}/>
       </View>
       <View style={styles.content}>
         <View style={styles.massageContainer}>
@@ -45,7 +47,7 @@ const getDisplayTime = (time:string) => {
           <Text style={styles.reply}>Reply</Text>
         </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 

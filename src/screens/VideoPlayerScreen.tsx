@@ -21,11 +21,14 @@ const VideoPlayerScreen = () => {
     formatTime,
     togglePlayPause,
     toggleMuteUnMute,
-     isFullscreen,
+    isFullscreen,
     toggleFullscreen,
     setCurrentTime,
     setNewComment,
     handleAddComment,
+    handleMenu,
+    deleteComment,
+    commentDelete
   } = useVideoPlayerScreenController();
 
   return (
@@ -55,6 +58,9 @@ const VideoPlayerScreen = () => {
         newComment={newComment}
         setNewComment={setNewComment}
         handleAddComment={handleAddComment}
+        handleMenu={handleMenu}
+        deleteComment={deleteComment}
+        commentDelete={commentDelete}
       />
     </View>
   );
