@@ -1,61 +1,73 @@
 import { useRef, useState } from "react";
 
 const useVideoPlayerScreenController = () => {
-  // Add your controller logic here
-    const videoRef = useRef(null);
+  const videoRef = useRef<any>(null);
   const [currentTime, setCurrentTime] = useState(0);
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState<any>([]);
   const [newComment, setNewComment] = useState('');
-  const [drawingPaths, setDrawingPaths] = useState([]);
-  const [currentPath, setCurrentPath] = useState('');
-  const [color, setColor] = useState('#FF0000');
-  const [isDrawing, setIsDrawing] = useState(false);
+  const [paused, setPaused] = useState(true);
+  const [muted, setMuted] = useState(false);
+  const [isFullscreen, isSetFullscreen] = useState(false);
+  const [duration, setDuration] = useState(0);
 
 const handleAddComment = () => {
     if (!newComment.trim()) return;
-    setComments(prev => [
+    setComments((prev: any) => [
       ...prev,
       { id: Date.now().toString(), time: currentTime, text: newComment },
-    ]);
+    ].reverse());
     setNewComment('');
   };
 
-  const handleTouchStart = (evt) => {
-    if (!isDrawing) return;
-    const { locationX, locationY } = evt.nativeEvent;
-    setCurrentPath(`M${locationX} ${locationY}`);
+  const togglePlayPause = () => {
+    setPaused(!paused);
   };
 
-  const handleTouchMove = (evt) => {
-    if (!isDrawing || !currentPath) return;
-    const { locationX, locationY } = evt.nativeEvent;
-    setCurrentPath(prev => `${prev} L${locationX} ${locationY}`);
+  const toggleMuteUnMute = () => {
+    setMuted(!muted);
+  };
+  const toggleFullscreen = () => {
+    isSetFullscreen(!isFullscreen);
+  };
+  const onProgress = (data:any) => {
+    setCurrentTime(data.currentTime);
   };
 
-  const handleTouchEnd = () => {
-    if (currentPath) {
-      setDrawingPaths(prev => [...prev, { d: currentPath, color }]);
-      setCurrentPath('');
-    }
-}
+  const onLoad = (data:any) => {
+    setDuration(data);
+  };
+
+  const onSeek = (value:any) => {
+    videoRef.current.seek(value);
+    setCurrentTime(value);
+  };
+
+  const formatTime = (seconds:any) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
 
   return {
     videoRef,
     currentTime,
     comments,
     newComment,
-    drawingPaths,
-    currentPath,
-    color,
-    isDrawing,
+    duration,
     setCurrentTime,
     setNewComment,
-    setColor,
-    setIsDrawing,
     handleAddComment,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd
+    togglePlayPause,
+    onProgress,
+    onLoad,
+    onSeek,
+    paused,
+    formatTime,
+    muted,
+    toggleMuteUnMute,
+    setDuration,
+    isFullscreen,
+    toggleFullscreen,
   };
 }
 

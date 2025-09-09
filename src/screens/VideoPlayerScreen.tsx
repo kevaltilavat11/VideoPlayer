@@ -1,17 +1,10 @@
 
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  TextInput,
-  StyleSheet,
-} from 'react-native';
-import Video from 'react-native-video';
-import Svg, { Path } from 'react-native-svg';
+import {View,StyleSheet} from 'react-native';
 import useVideoPlayerScreenController from './VideoPlayerScreenController';
-import { CommonColor } from '../constents/CommonColor';
+import { CommonColor } from '../constants/CommonColor';
+import CustomVideo from '../components/CustomVideo';
+import CommentsSection from '../components/CommentSection';
 
 const VideoPlayerScreen = () => {
 
@@ -20,98 +13,77 @@ const VideoPlayerScreen = () => {
     currentTime,
     comments,
     newComment,
-    drawingPaths,
-    currentPath,
-    color,
-    isDrawing,
+    duration,
+    paused,
+    muted,
+    onSeek,
+    onLoad,
+    formatTime,
+    togglePlayPause,
+    toggleMuteUnMute,
+     isFullscreen,
+    toggleFullscreen,
     setCurrentTime,
     setNewComment,
-    setColor,
-    setIsDrawing,
     handleAddComment,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd
   } = useVideoPlayerScreenController();
 
   return (
     <View style={styles.container}>
-      <View
-        style={styles.videoWrapper}
-        onStartShouldSetResponder={() => true}
-        onResponderStart={handleTouchStart}
-        onResponderMove={handleTouchMove}
-        onResponderRelease={handleTouchEnd}
-      >
-        <Video
-          ref={videoRef}
-          source={{ uri: 'https://www.w3schools.com/html/mov_bbb.mp4' }}
-          style={styles.video}
-          resizeMode="contain"
-          onProgress={({ currentTime }) => setCurrentTime(currentTime)}
-          paused={false}
+      <View style={styles.videoContainer}>
+        <CustomVideo
+          videoRef={videoRef}
+          currentTime={currentTime}
+          duration={duration}
+          paused={paused}
+          muted={muted}
+          setCurrentTime={setCurrentTime}
+          setDuration={onLoad}
+          togglePlayPause={togglePlayPause}
+          fullscreen={isFullscreen}
+          toggleFullscreen={toggleFullscreen}
+          toggleMuteUnMute={toggleMuteUnMute}
+          onSeek={onSeek}
+          formatTime={formatTime}
         />
-        <Svg style={StyleSheet.absoluteFill}>
-          {drawingPaths.map((p, idx) => (
-            <Path key={idx} d={p.d} stroke={p.color} strokeWidth={3} fill="none" />
-          ))}
-          {currentPath ? (
-            <Path d={currentPath} stroke={color} strokeWidth={3} fill="none" />
-          ) : null}
-        </Svg>
       </View>
-
-      <FlatList
-        data={comments}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              videoRef.current.seek(item.time);
-            }}
-          >
-            <Text style={styles.comment}>
-              [{formatTime(item.time)}] {item.text}
-            </Text>
-          </TouchableOpacity>
-        )}
-        style={{ flex: 1, width: '100%' }}
+      <CommentsSection
+        comments={comments}
+        videoRef={videoRef}
+        currentTime={currentTime}
+        setCurrentTime={setCurrentTime}
+        newComment={newComment}
+        setNewComment={setNewComment}
+        handleAddComment={handleAddComment}
       />
-
-      <View style={styles.commentInput}>
-        <Text>{formatTime(currentTime)}</Text>
-        <TextInput
-          placeholder="Write your comment..."
-          style={styles.input}
-          value={newComment}
-          onChangeText={setNewComment}
-        />
-        <TouchableOpacity onPress={handleAddComment} style={styles.commentBtn}>
-          <Text style={{ color: '#fff' }}>Comment</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.tools}>
-        <TouchableOpacity onPress={() => setIsDrawing(!isDrawing)} style={styles.toolBtn}>
-          <Text>{isDrawing ? 'Stop Drawing' : 'Draw'}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setColor(CommonColor.red)} style={[styles.colorBox, { backgroundColor: CommonColor.red }]} />
-        <TouchableOpacity onPress={() => setColor(CommonColor.lightGreen)} style={[styles.colorBox, { backgroundColor: CommonColor.lightGreen }]} />
-        <TouchableOpacity onPress={() => setColor(CommonColor.blue)} style={[styles.colorBox, { backgroundColor: CommonColor.blue }]} />
-      </View>
     </View>
   );
 };
 
-const formatTime = (sec: any) => {
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${m}:${s < 10 ? '0' + s : s}`;
-};
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: CommonColor.white, padding: 10 },
+  container: { flex: 1, backgroundColor: CommonColor.white, },
+  slider: {
+    flex: 1,
+    marginHorizontal: 8,
+  },
+  time: {
+    color: '#fff',
+    fontSize: 12,
+    marginHorizontal: 6,
+  },
+  controls: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+  },
   videoWrapper: { height: 250, backgroundColor: CommonColor.black },
+  videoContainer: { alignItems: 'center', margin: 10 },
   video: { ...StyleSheet.absoluteFillObject },
   comment: { padding: 5, borderBottomWidth: 1, borderColor: CommonColor.offWhite },
   commentInput: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
